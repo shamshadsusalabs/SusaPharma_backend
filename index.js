@@ -53,6 +53,14 @@ app.use('/api/v1/',  Discount  );
 
 const Order = require('./Router/Order');  // Import the User router
 app.use('/api/v1/',  Order );
+
+
+
+const narcotis = require('./Router/NarcotisUser');  // Import the User router
+app.use('/api/v1/narcotis',  narcotis  );
+
+const Campaign = require('./Router/CampaingnUser');  // Import the User router
+app.use('/api/v1/Campaign',  Campaign );
 // Example route to check if the server is running
 app.get("/", (req, res) => {
     res.send("Hello, world!");

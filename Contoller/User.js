@@ -1,6 +1,7 @@
 const User = require("../Schema/User");
 const cloudinary = require("../MiddleWare/cloudinary");
-const bcrypt = require('bcryptjs'); 
+const bcrypt = require('bcryptjs');
+ 
 // SignUp Controller
 const getStoreProfile = async (req, res) => {
     try {

@@ -17,6 +17,7 @@ const orderSchema = new mongoose.Schema(
       name: { type: String, required: true },
       shopName: { type: String },
       quantity:{type:Number},
+      paymentMode:{type:String},
       oderuserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true }, 
       status: {
         type: String,
