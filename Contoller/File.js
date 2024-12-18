@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const cloudinary = require('cloudinary').v2;
 const File = require('../Schema/File');
-const axios = require('axios');
+
 const jwt = require('jsonwebtoken');
 
 
@@ -33,6 +33,33 @@ const twilio = require('twilio');
                     padding: 0;
                     background-color: #f5f5f5;
                 }
+
+                .header {
+    border-bottom: 2px solid red;
+    padding-bottom: 10px;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.left-image img, 
+.right-image img {
+    width: 300px;  /* Fixed width */
+    height: 150px; /* Fixed height */
+    object-fit: cover; /* Ensures the image fills the area without distortion */
+}
+
+
+
+
+.center-content {
+    text-align: center;
+    flex: 1; /* Center content takes remaining space */
+}
+
                 .invoice-container {
                     max-width: 900px;
                     margin: 20px auto;
@@ -111,37 +138,48 @@ const twilio = require('twilio');
                 .footer p {
                     margin: 5px 0;
                 }
-                .footer .signature {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: 20px;
-                }
-                .footer .signature div {
-                    text-align: center;
-                }
+               
             </style>
         </head>
         <body>
             <div class="invoice-container">
-                <div class="header">
-                    <h1>TAX INVOICE</h1>
-                    <p><strong>Shop Name:</strong> ${userDetails.shopName}</p>
-                    <p><strong>Address:</strong> ${userDetails.address || address}</p>
-                </div>
+              <div class="header">
+    <div class="header-container">
+        <div class="left-image">
+            <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ice-cream-ad-poster-flyer-template-design-04ba11b55ba8e6f441e21ca17698dffb_screen.jpg?ts=1637008762" alt="Left Logo" />
+        </div>
+        <div class="center-content">
+            <h1>TAX INVOICE</h1>
+            <p><strong>Shop Name:</strong> ${userDetails.shopName}</p>
+            <p><strong>Address:</strong> ${userDetails.address || address}</p>
+        </div>
+        <div class="right-image">
+            <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ice-cream-ad-poster-flyer-template-design-04ba11b55ba8e6f441e21ca17698dffb_screen.jpg?ts=1637008762" alt="Right Logo" />
+        </div>
+    </div>
+</div>
 
-                <div class="sub-header">
-                    <div>
-                        <p><strong>GSTIN:</strong> ${userDetails.gstNumber}</p>
-                        <p><strong>Licence No:</strong> ${userDetails.licenseNumber}</p>
-                        <p><strong>Doctor Name:</strong> ${doctorName}</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <p><strong>Invoice No:</strong> GMA-14</p>
-                        <p><strong>Date:</strong> ${date}</p>
-                        <p><strong>Phone:</strong> ${ContactNumber}</p>
-                        <p><strong>Patient Name:</strong> ${patientName}</p>
-                    </div>
-                </div>
+
+               <div class="sub-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <p><strong>GSTIN:</strong> ${userDetails.gstNumber}</p>
+        <p><strong>Licence No:</strong> ${userDetails.licenseNumber}</p>
+        <p><strong>Doctor Name:</strong> ${doctorName}</p>
+    </div>
+
+    <!-- Image in the middle -->
+    <div style="flex: 0 0 auto;">
+        <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ice-cream-ad-poster-flyer-template-design-04ba11b55ba8e6f441e21ca17698dffb_screen.jpg?ts=1637008762" alt="Left Logo" style="width: 500px; height: 200px; object-fit: cover;" />
+    </div>
+
+    <div style="text-align: right;">
+        <p><strong>Invoice No:</strong> GMA-14</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Phone:</strong> ${ContactNumber}</p>
+        <p><strong>Patient Name:</strong> ${patientName}</p>
+    </div>
+</div>
+
 
                 <div class="details">
                     <table>
@@ -193,18 +231,19 @@ const twilio = require('twilio');
                     </table>
                 </div>
 
-                <div class="footer">
-                    <p><strong>GST Applied:</strong> ${gst}%</p>
-                    <p>Thank you for your business!</p>
-                    <p>Invoice generated on: ${new Date().toLocaleDateString()}</p>
+              <div class="footer" style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 20px; font-size: 12px; line-height: 1.6;">
+    <div class="footer-left" style="text-align: left;">
+        <p><strong>GST Applied:</strong> ${gst}%</p>
+        <p>Thank you for your business!</p>
+        <p>Invoice generated on: ${new Date().toLocaleDateString()}</p>
+        <p><strong>Checked By</strong></p>
+        <p><strong>Packed By</strong></p>
+    </div>
+    <div class="footer-right">
+        <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ice-cream-ad-poster-flyer-template-design-04ba11b55ba8e6f441e21ca17698dffb_screen.jpg?ts=1637008762" alt="Right Logo" style="width: 500px; height: 200px; object-fit: cover;" />
+    </div>
+</div>
 
-                    <div class="signature">
-                        <div>
-                            <p><strong>Checked By</strong></p>
-                        </div>
-                        <div>
-                            <p><strong>Packed By</strong></p>
-                        </div>
                     </div>
                 </div>
             </div>

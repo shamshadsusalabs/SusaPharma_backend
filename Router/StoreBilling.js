@@ -13,7 +13,7 @@ router.get('/billings/userId/:userId', authenticateToken,billingController.getBi
 router.get('/billing/unpaid/:userId', authenticateToken,billingController.getUnpaidBillingByUserId);
 
 router.get('/billing/revenue/:userId', authenticateToken,billingController.getRevenueForCurrentMonth);
-
+router.get('/billing/total-amount_by_Month/:userId', authenticateToken, billingController.getTotalAmountByMonth);
 router.post('/billing/send-message',authenticateToken, billingController.sendMessage);
 router.get('/billing/get-unpaid-billings-notifications/:contactNumber',authenticateToken,billingController.getUnpaidBillingWithMessage);
 

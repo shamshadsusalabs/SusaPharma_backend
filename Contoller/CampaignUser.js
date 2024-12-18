@@ -1,58 +1,52 @@
 const User = require('../Schema/CampaignUser');
 const bcrypt = require('bcrypt');
-
 const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+  try {
+      const { email, password } = req.body;
 
-        // Find the user by email
-        const user = await User.findOne({ email });
+      // Find the user by email
+      const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(400).json({ message: "Invalid email or password" });
-        }
+      if (!user) {
+          return res.status(400).json({ message: "Invalid email or password" });
+      }
 
-        // Compare the provided password with the stored hashed password
-        const passwordIsValid = await user.comparePassword(password);
+      // Compare the provided password with the stored hashed password
+      const passwordIsValid = await user.comparePassword(password);
 
-        if (!passwordIsValid) {
-            return res.status(400).json({ message: "Invalid email or password" });
-        }
+      if (!passwordIsValid) {
+          return res.status(400).json({ message: "Invalid email or password" });
+      }
 
-        // Check if the user is approved
-        if (!user.approved) {
-            return res.status(403).json({ message: "User not approved" });
-        }
+      // Generate a token for the user using the static method
+      const token = User.generateAccessToken(user);
 
-        // Generate a token for the user using the static method
-        const token = User.generateAccessToken(user);
+      // Set the token in an HTTP-only cookie
+      res.cookie('access_token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',  // Only 'secure' in production
+          maxAge: 24 * 60 * 60 * 1000,  // 1 day expiration
+          sameSite: 'Strict',
+      });
 
-        // Set the token in an HTTP-only cookie
-        res.cookie('access_token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',  // Only 'secure' in production
-            maxAge: 24 * 60 * 60 * 1000,  // 1 day expiration
-            sameSite: 'Strict',
-        });
-
-        // Respond with the token and user details
-        return res.status(200).json({
-            message: "Login successful",
-            token,
-            user: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                contact: user.contact,
-                profile: user.profile,
-                
-            },
-        });
-    } catch (error) {
-        console.error("Error during login:", error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
+      // Respond with the token and user details
+      return res.status(200).json({
+          message: "Login successful",
+          token,
+          user: {
+              _id: user._id,
+              name: user.name,
+              email: user.email,
+              contact: user.contact,
+              profile: user.profile,
+          },
+      });
+  } catch (error) {
+      console.error("Error during login:", error);
+      return res.status(500).json({ message: "Internal server error" });
+  }
 };
+
 
 
 // Create a new user

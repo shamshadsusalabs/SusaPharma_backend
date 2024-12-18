@@ -61,6 +61,11 @@ app.use('/api/v1/narcotis',  narcotis  );
 
 const Campaign = require('./Router/CampaingnUser');  // Import the User router
 app.use('/api/v1/Campaign',  Campaign );
+
+
+
+const Patient = require('./Router/Patient');  // Import the User router
+app.use('/api/v1/Patient',  Patient  );
 // Example route to check if the server is running
 app.get("/", (req, res) => {
     res.send("Hello, world!");

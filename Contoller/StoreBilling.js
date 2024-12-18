@@ -1,4 +1,80 @@
 const Billing = require('../Schema/StoreBilling');
+const mongoose = require('mongoose');
+
+ // Assuming you have a Billing model
+
+ exports.getTotalAmountByMonth = async (req, res) => {
+  const { userId } = req.params;
+  console.log('User ID from URL params:', userId);
+
+  // Step 1: Validate the userId
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: 'Invalid userId format' });
+  }
+
+  try {
+    // Step 2: Define the date range for the last 3 months
+    const currentDate = new Date();
+    const startOfMonth = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), 1));
+    const threeMonthsAgo = new Date(startOfMonth);
+    threeMonthsAgo.setMonth(currentDate.getUTCMonth() - 3);
+
+    const endOfRange = new Date();
+    endOfRange.setHours(23, 59, 59, 999);
+
+    console.log("Filtering from:", threeMonthsAgo.toISOString());
+    console.log("Filtering to:", endOfRange.toISOString());
+
+    // Step 3: Fetch only totalAmount and date fields
+    const result = await Billing.find(
+      {
+        userId: new mongoose.Types.ObjectId(userId),
+        date: { $gte: threeMonthsAgo, $lte: endOfRange },
+      },
+      { totalAmount: 1, date: 1, _id: 0 } // Projection: Include only totalAmount and date
+    );
+
+    console.log("Filtered Results:", result);
+
+    // Step 4: Group the results by month and year and sum the totalAmount
+    const monthlyTotals = {};
+
+    result.forEach(item => {
+      // Extract the month and year from the date
+      const month = item.date.getMonth() + 1; // getMonth() is 0-based, so we add 1
+      const year = item.date.getFullYear();
+
+      // Create a unique key for the month and year
+      const key = `${month}-${year}`;
+
+      // If the key already exists, add the totalAmount, otherwise initialize it
+      if (monthlyTotals[key]) {
+        monthlyTotals[key].totalAmount += item.totalAmount;
+      } else {
+        monthlyTotals[key] = {
+          month: month,
+          year: year,
+          totalAmount: item.totalAmount
+        };
+      }
+    });
+
+    // Convert the monthlyTotals object to an array
+    const finalResult = Object.values(monthlyTotals);
+
+    // Step 5: Send the aggregated result
+    res.json(finalResult);
+
+  } catch (err) {
+    console.error('Error:', err);
+    return res.status(500).json({ message: 'An error occurred' });
+  }
+};
+
+
+
+
+
 
 
 
