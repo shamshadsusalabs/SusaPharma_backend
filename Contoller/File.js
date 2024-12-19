@@ -6,15 +6,60 @@ const cloudinary = require('cloudinary').v2;
 const File = require('../Schema/File');
 
 const jwt = require('jsonwebtoken');
-
+const Confirmads = require('../Schema/Confirmads');
 
 
 const twilio = require('twilio'); 
+
+const incrementCount = async (advertisementId) => {
+    try {
+      // Find the advertisement by its ID and increment the count by 1
+      const updatedAd = await Confirmads.findByIdAndUpdate(
+        advertisementId, 
+        { $inc: { count: 1 } },  // Increment the count by 1
+        { new: true }  // Return the updated document
+      );
+  
+      if (!updatedAd) {
+        return { status: 404, message: 'Advertisement not found' };
+      }
+  
+      return { status: 200, message: 'Count incremented successfully', data: updatedAd };
+    } catch (error) {
+      console.error(error);
+      return { status: 500, message: 'Error occurred while incrementing count' };
+    }
+  };
+const fetchImageAndPosition = async () => {
+    try {
+        // Hardcode the documentId since it's static
+        const documentId = '6763e1f2df18d905d7d5aba6';
+  
+        // Fetch the document by its _id
+        const document = await Confirmads.findById(documentId);
+  
+        if (!document) {
+            console.log('Document not found.');
+            return;
+        }
+  
+        // Return images and positions dynamically
+        return document.images; // Returns an array of images with their URLs and positions
+    } catch (error) {
+        console.error('Error fetching document:', error);
+    }
+};
+  
+  // Call the function with the specified document ID
 
 
   // Assuming you have a File model for saving file details in the database
 
   const savingBillFile = async (req, res) => {
+
+     const images = await fetchImageAndPosition();
+     const advertisementId = '6763e1f2df18d905d7d5aba6'; // This is the advertisement ID you want to increment the count for
+     const incrementResult = await incrementCount(advertisementId);
     try {
         const { patientName, doctorName, AdharCardNumber, date, address, ContactNumber, gst, paymentMode, discount, totalAmount, rows, userId, userDetails } = req.body;
 
@@ -146,7 +191,7 @@ const twilio = require('twilio');
               <div class="header">
     <div class="header-container">
         <div class="left-image">
-            <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ice-cream-ad-poster-flyer-template-design-04ba11b55ba8e6f441e21ca17698dffb_screen.jpg?ts=1637008762" alt="Left Logo" />
+            <img src="${images[0]?.imageUrl}" alt="Left Logo" />
         </div>
         <div class="center-content">
             <h1>TAX INVOICE</h1>
@@ -154,7 +199,7 @@ const twilio = require('twilio');
             <p><strong>Address:</strong> ${userDetails.address || address}</p>
         </div>
         <div class="right-image">
-            <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ice-cream-ad-poster-flyer-template-design-04ba11b55ba8e6f441e21ca17698dffb_screen.jpg?ts=1637008762" alt="Right Logo" />
+            <img src="${images[1]?.imageUrl}" alt="Right Logo" />
         </div>
     </div>
 </div>
@@ -169,7 +214,7 @@ const twilio = require('twilio');
 
     <!-- Image in the middle -->
     <div style="flex: 0 0 auto;">
-        <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ice-cream-ad-poster-flyer-template-design-04ba11b55ba8e6f441e21ca17698dffb_screen.jpg?ts=1637008762" alt="Left Logo" style="width: 500px; height: 200px; object-fit: cover;" />
+        <img src="${images[2]?.imageUrl}" alt="Left Logo" style="width: 500px; height: 200px; object-fit: cover;" />
     </div>
 
     <div style="text-align: right;">
@@ -240,7 +285,7 @@ const twilio = require('twilio');
         <p><strong>Packed By</strong></p>
     </div>
     <div class="footer-right">
-        <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ice-cream-ad-poster-flyer-template-design-04ba11b55ba8e6f441e21ca17698dffb_screen.jpg?ts=1637008762" alt="Right Logo" style="width: 500px; height: 200px; object-fit: cover;" />
+        <img src="${images[3]?.imageUrl}" alt="Right Logo" style="width: 500px; height: 200px; object-fit: cover;" />
     </div>
 </div>
 

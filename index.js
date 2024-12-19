@@ -66,6 +66,15 @@ app.use('/api/v1/Campaign',  Campaign );
 
 const Patient = require('./Router/Patient');  // Import the User router
 app.use('/api/v1/Patient',  Patient  );
+
+
+
+const ads = require('./Router/Advertisement');  // Import the User router
+app.use('/api/v1/ads',  ads );
+
+
+const   confirmads = require('./Router/Confirmads');  // Import the User router
+app.use('/api/v1/confirmads',   confirmads);
 // Example route to check if the server is running
 app.get("/", (req, res) => {
     res.send("Hello, world!");
