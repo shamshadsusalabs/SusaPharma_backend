@@ -86,7 +86,7 @@ exports.getDistributorByUserId = async (req, res) => {
 // Create a new distributor
 exports.createDistributor = async (req, res) => {
   try {
-    const { shopName, drugName, discount,  contactNumber, deliveryType1, deliveryTime, address, profile, userId } = req.body;
+    const { shopName, drugName, discount,  contactNumber, deliveryType1, deliveryTime, address, profile, userId ,quantity} = req.body;
 
     // Create a new distributor instance
     const distributor = new Distributor({
@@ -99,6 +99,7 @@ exports.createDistributor = async (req, res) => {
       address,
       profile,
       userId,
+      quantity
     });
 
     // Save the distributor to the database

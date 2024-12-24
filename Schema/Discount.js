@@ -7,6 +7,10 @@ const discountSchema = new Schema({
     type: String,
     required: true
   },
+  quantity:{
+    type:Number,
+    required:true
+  },
   drugName:{
      type: String,
     required: true

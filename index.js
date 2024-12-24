@@ -75,6 +75,10 @@ app.use('/api/v1/ads',  ads );
 
 const   confirmads = require('./Router/Confirmads');  // Import the User router
 app.use('/api/v1/confirmads',   confirmads);
+
+
+const   customeruser = require('./Router/Customeruser');  // Import the User router
+app.use('/api/v1/customeruser',     customeruser );
 // Example route to check if the server is running
 app.get("/", (req, res) => {
     res.send("Hello, world!");

@@ -476,11 +476,36 @@ const getInvoicesByUserId = async (req, res) => {
     }
 };
 
+const getImagesByUserId = async (req, res) => {
+  try {
+    // Static user ID
+    const userId = "6763e1f2df18d905d7d5aba6";
+    console.log('User ID:', userId);  // Log the static user ID
+
+    // Find the user by ID in the database
+    const user = await Confirmads.findById(userId);
+
+
+    if (!user) {
+      console.log('User not found');  // Log if user is not found
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respond with the images array
+ 
+    res.json(user.images || []);
+  } catch (error) {
+    console.error('Error occurred:', error);  // Log any errors that occur
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 module.exports = {
     savingBillFile,
     getInvoicesByUserId,
  loginWithContactNumber,
- getUsersByContactNumber 
+ getUsersByContactNumber ,
+ getImagesByUserId
     // Export the new function
 };
