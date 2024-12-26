@@ -47,65 +47,69 @@ exports.getDistributorSuppliedCount = async (req, res) => {
 exports.getExpiringDrugs = async (req, res) => {
   try {
     const { userId } = req.params;
-   
 
     // Validate userId
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-   
       return res.status(400).json({ message: "Valid User ID is required" });
     }
- 
 
-    // Get current date and set it to midnight (start of the day)
-    const currentDate = new Date();
-    currentDate.setUTCHours(0, 0, 0, 0);  // Midnight of today
+    // Fetch all store details for the given userId
+    const storeData = await Store.find({ user: new mongoose.Types.ObjectId(userId) });
 
-
-    // Calculate the first day of next month
-    const nextMonthStart = new Date(currentDate);
-    nextMonthStart.setMonth(currentDate.getMonth() + 1);
-    nextMonthStart.setUTCDate(1); // Set date to first of the next month
-    nextMonthStart.setUTCHours(0, 0, 0, 0);  // Midnight of next month
-  
-
- 
-    const stores = await Store.aggregate([
-      { $match: { user: new mongoose.Types.ObjectId(userId) } },
-      { $unwind: "$distributorSupplied" },
-      {
-        $match: {
-          $or: [
-            {
-              "distributorSupplied.expiryDate": { $lt: currentDate }  // Already expired
-            },
-            {
-              "distributorSupplied.expiryDate": {
-                $gte: currentDate,  // Expiry date after or equal to today
-                $lt: nextMonthStart  // Expiry date before the start of next month
-              }
-            }
-          ]
-        }
-      },
-      { $project: { _id: 0, drug: "$distributorSupplied" } }  // Project the drug information
-    ]);
-
-
-    // Return empty array if no drugs found
-    if (stores.length === 0) {
-      console.log("No expiring or expired drugs found.");
-      return res.status(200).json([]);  // Empty array response
+    if (storeData.length === 0) {
+      return res.status(404).json({ message: "No store data found for the given User ID" });
     }
 
-   
-    res.status(200).json(stores.map(store => store.drug));
+    // Convert the Mongoose document to plain JavaScript object
+    const storeDataPlain = storeData.map(item => item._doc); // Extract actual data
+
+    // Get current date
+    const currentDate = new Date();
+
+    // Get the date for 3 months ahead
+    const threeMonthsLater = new Date();
+    threeMonthsLater.setMonth(currentDate.getMonth() + 3);
+
+
+
+    // Iterate through storeData and filter expired items and items expiring in the next 3 months
+    const expiredAndUpcomingData = storeDataPlain.map(store => {
+      const expiredDistributor = store.distributorSupplied.filter(item => {
+        const expiryDate = new Date(item.expiryDate); // Ensure it's a Date object
+        return expiryDate < currentDate; // Expired items
+      });
+      const upcomingExpiryDistributor = store.distributorSupplied.filter(item => {
+        const expiryDate = new Date(item.expiryDate); // Ensure it's a Date object
+        return expiryDate > currentDate && expiryDate <= threeMonthsLater; // Items expiring within 3 months
+      });
+
+    
+
+      if (expiredDistributor.length > 0 || upcomingExpiryDistributor.length > 0) {
+        return {
+          ...store,
+          distributorSupplied: [
+            ...expiredDistributor, // Include expired items
+            ...upcomingExpiryDistributor // Include upcoming items expiring in the next 3 months
+          ]
+        };
+      }
+      return null; // Return null if no expired or upcoming data found for that store
+    }).filter(store => store !== null); // Remove null values from the final result
+
+    if (expiredAndUpcomingData.length === 0) {
+      return res.status(404).json({ message: "No expired or upcoming expiring drugs found" });
+    }
+
+    // Send the expired and upcoming expiry data
+    res.status(200).json(expiredAndUpcomingData);
   } catch (error) {
- 
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
 
+ // Log the data being sent in the 
 
 
 

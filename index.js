@@ -75,7 +75,8 @@ app.use('/api/v1/ads',  ads );
 
 const   confirmads = require('./Router/Confirmads');  // Import the User router
 app.use('/api/v1/confirmads',   confirmads);
-
+const   ExpiryCancle = require('./Router/ExpiryCancle');  // Import the User router
+app.use('/api/v1/ExpiryCancle',     ExpiryCancle);
 
 const   customeruser = require('./Router/Customeruser');  // Import the User router
 app.use('/api/v1/customeruser',     customeruser );
